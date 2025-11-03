@@ -1,0 +1,22 @@
+# This is a basic workflow to help you get started with Actions
+
+name: more_jobs
+
+
+on:
+  schedule:
+    - cron: '00, 13 * * 1,2,3'
+
+env:
+  DAY_OF_WEEK: Monday
+  First_Name: Hampus
+
+jobs:
+  test_schedule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Not on Monday to Wensday
+        if: github.event.schedule != '00, 13 * * 1,2,3'
+        run: echo "This step will be skipped on Monday and Wednesday"
+      - name: Every time
+        run: echo "This step will always run"
