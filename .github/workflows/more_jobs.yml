@@ -5,7 +5,7 @@ name: more_jobs
 
 on:
   schedule:
-    - cron: '40 * * * 1,2,3'
+    - cron: '45 * * * *'
 
   workflow_dispatch:
 
