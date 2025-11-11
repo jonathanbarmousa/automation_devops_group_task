@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: TPS6
+name: JB6
 
 # Controls when the workflow will run
 on:
