@@ -1,7 +1,7 @@
-name: Weather App
+name: streamlit-App
 on:
   push:
-    branches: [ "TPS6" ]
+    branches: [ "main" ]
   workflow_dispatch:
     inputs:
       logging_errors:
@@ -10,12 +10,6 @@ on:
         default: "true"
         type: choice
         options: ["true", "false"]
-
-env:
-  PYTHON_VERSION: "3.11"
-  IMAGE_NAME: jonathanbarmousa/streamlit-app
-  DOCKERFILE_PATH: ./dockerfile
-  DOCKER_TAG_LATEST: latest
 
 jobs:
 
@@ -26,10 +20,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
@@ -46,10 +40,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
@@ -61,14 +55,14 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p junit
-          pytest tests/test_get_api.py tests/test_dashboard.py | tee junit/pytest-output.txt || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+          pytest tests/test_get_api.py tests/test_dashboard.py --maxfail=5 --disable-warnings --junitxml=junit/pytest-output.xml || echo "TESTS_FAILED=true" >> $GITHUB_ENV
 
       - name: Upload test log (endast vid workflow_dispatch + param true + tester faller)
         if: ${{ env.TESTS_FAILED == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.logging_errors == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: pytest-log
-          path: junit/pytest-output.txt
+          path: junit/pytest-output.xml
 
       - name: Fail job if tests failed
         if: ${{ env.TESTS_FAILED == 'true' }}
@@ -98,7 +92,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ${{ env.DOCKERFILE_PATH }}
+          file: ./dockerfile
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG_LATEST }}
+            ${{ secrets.DOCKER_USER }}/streamlit-app:${{ github.sha }}
+            ${{ secrets.DOCKER_USER }}/streamlit-app:latest
