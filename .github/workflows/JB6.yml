@@ -1,99 +1,36 @@
-name: streamlit-App
+# This is a basic workflow to help you get started with Actions
+
+name: JB6
+
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-    inputs:
-      logging_errors:
-        description: "Skapa logg om tester misslyckas"
-        required: true
-        default: "true"
-        type: choice
-        options: ["true", "false"]
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-
-  environment_check:
-    name: Environment check
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
 
-      - name: Install dependencies
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-          python -m pip install pytest
-
-  tests:
-    name: Run tests
-    runs-on: ubuntu-latest
-    needs: environment_check
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-          python -m pip install pytest
-
-      - name: Run pytest
-        run: |
-          set -o pipefail
-          mkdir -p junit
-          pytest tests/test_get_api.py tests/test_dashboard.py --maxfail=5 --disable-warnings --junitxml=junit/pytest-output.xml || echo "TESTS_FAILED=true" >> $GITHUB_ENV
-
-      - name: Upload test log (endast vid workflow_dispatch + param true + tester faller)
-        if: ${{ env.TESTS_FAILED == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.logging_errors == 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: pytest-log
-          path: junit/pytest-output.xml
-
-      - name: Fail job if tests failed
-        if: ${{ env.TESTS_FAILED == 'true' }}
-        run: |
-          echo "Test har misslyckats"
-          exit 1
-
-  build_and_push:
-    name: Build and push Docker image
-    runs-on: ubuntu-latest
-    needs: tests
-    if: needs.tests.result == 'success'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USER }}/streamlit-app:${{ github.sha }}
-            ${{ secrets.DOCKER_USER }}/streamlit-app:latest
+          echo Add other actions to build,
+          echo test, and deploy your project.
