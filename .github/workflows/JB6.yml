@@ -15,7 +15,7 @@ on:
 env:
   PYTHON_VERSION: "3.11"
   IMAGE_NAME: jonathanbarmousa/dev-ops
-  DOCKERFILE_PATH: ./Dockerfile
+  DOCKERFILE_PATH: ./dockerfile
   DOCKER_TAG_LATEST: latest
 
 jobs:
