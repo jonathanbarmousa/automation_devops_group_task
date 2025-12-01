@@ -1,4 +1,4 @@
-name: Weather With You
+name: Jonathan - Weather With You
 
 on:
   push:
@@ -15,7 +15,7 @@ on:
 env:
   PYTHON_VERSION: "3.11"
   IMAGE_NAME: jonathanbarmousa/dev-ops
-  DOCKERFILE_PATH: ./dockerfile
+  DOCKERFILE_PATH: ./Dockerfile
   DOCKER_TAG_LATEST: latest
 
 jobs:
